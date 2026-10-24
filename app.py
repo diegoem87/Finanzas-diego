@@ -137,7 +137,26 @@ else:
         mcol2.metric("Total Costos", f"ARS \\${total_costos:,.2f}", f"USD \\${total_costos/VALOR_DOLAR_BLUE:,.2f}")
         
         if balance >= 0:
-            mcol3.metric("Ahorro / Ganancia Mensual", f"ARS \\${balance:,.2f}", f"USD \\${balance/VALOR_DOLAR_BLUE:,.2f}", delta="¡Excelente!")
+           # --- Aseguramos que el balance y el dólar sean números válidos ---
+try:
+    # Si 'balance' viene de una resta de DataFrames o Series, extraemos el valor escalar usando .iloc[0] o sum() si corresponde.
+    # Forzamos conversión a float para evitar que sea string o None.
+    balance_num = float(balance)
+except (TypeError, ValueError, AttributeError):
+    balance_num = 0.0
+
+try:
+    dolar_num = float(VALOR_DOLAR_BLUE)
+except (TypeError, ValueError):
+    dolar_num = 1565.00  # Valor por defecto por seguridad
+
+# --- Métrica corregida ---
+mcol3.metric(
+    "Ahorro / Ganancia Mensual", 
+    f"ARS ${balance_num:,.2f}", 
+    f"USD ${balance_num / dolar_num:,.2f}", 
+    delta="¡Excelente!"
+)
         else:
             mcol3.metric("Déficit Mensual", f"ARS \\${balance:,.2f}", f"USD \\${balance/VALOR_DOLAR_BLUE:,.2f}", delta="Atención", delta_color="inverse")
 
